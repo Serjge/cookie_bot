@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { Markup, Telegraf } from 'telegraf';
 import { bold, fmt } from 'telegraf/format';
-import getCookie from './cookies';
+import { cookieController } from './controllers/cookies.controller';
 
 dotenv.config();
 
@@ -30,8 +30,14 @@ bot.command('start', (ctx) => {
   }
 });
 
-bot.hears(CMD_TEXT.cookie, (ctx) => {
-  ctx.reply(fmt`${bold`${getCookie()}`}`);
+bot.hears(CMD_TEXT.cookie, async (ctx) => {
+  const { rows } = await cookieController.getCookie();
+
+  const key = Math.round(Math.random() * rows.length) - 1;
+
+  if (key < rows.length) {
+    ctx.reply(fmt`🥠  ${bold`${rows[key].cookie}`}`);
+  }
 });
 
 bot.launch().then(() => {
