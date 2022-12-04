@@ -1,4 +1,4 @@
-creat TABLE cookies(
-id SERIAL PRIMARY KEY
-description VARCHAR(255)
+create TABLE cookies(
+id SERIAL PRIMARY KEY,
+cookie VARCHAR(255)
 )

@@ -1,9 +1,10 @@
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 import { Markup, Telegraf } from 'telegraf';
 import { bold, fmt } from 'telegraf/format';
-import { cookieController } from './controllers/cookies.controller';
+import { randomCookie } from 'utils/randomCookie';
+import { cookieController } from 'controllers/cookies.controller';
 
-dotenv.config();
+config();
 
 const token = process.env.TOKEN || '';
 
@@ -22,10 +23,9 @@ bot.command('start', (ctx) => {
 
   if (chat.type === 'private') {
     ctx.replyWithPhoto({ source: 'src/assets/image/cookie.jpg' });
+
     ctx.reply(`Привет, ${chat.first_name}! Ты попал на печеньки! 🍪`, {
-      disable_web_page_preview: true,
-      parse_mode: 'HTML',
-      ...mainMenu,
+      ...mainMenu, message_thread_id: 2,
     });
   }
 });
@@ -33,11 +33,7 @@ bot.command('start', (ctx) => {
 bot.hears(CMD_TEXT.cookie, async (ctx) => {
   const { rows } = await cookieController.getCookie();
 
-  const key = Math.round(Math.random() * rows.length) - 1;
-
-  if (key < rows.length) {
-    ctx.reply(fmt`🥠  ${bold`${rows[key].cookie}`}`);
-  }
+  ctx.reply(fmt`🥠  ${bold`${randomCookie(rows)}`}`);
 });
 
 bot.launch().then(() => {
@@ -47,5 +43,6 @@ bot.launch().then(() => {
 });
 
 // Enable graceful stop
+
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
